@@ -18,12 +18,16 @@ cdef extern from "shallow_water.c":
 		double maximum_allowed_speed
 		long low_froude
 		long timestep_fluxcalls
-		double beta_w
-		double beta_w_dry
-		double beta_uh
-		double beta_uh_dry
-		double beta_vh
-		double beta_vh_dry
+
+#             Single Precision values
+
+		float beta_w
+		float beta_w_dry
+		float beta_uh
+		float beta_uh_dry
+		float beta_vh
+		float beta_vh_dry
+
 		long max_flux_update_frequency
 		long ncol_riverwall_hydraulic_properties
 		long* neighbours
@@ -32,7 +36,7 @@ cdef extern from "shallow_water.c":
 		double* normals
 		double* edgelengths
 		double* radii
-		double* areas
+		float* areas #changes from d to f 
 		long* edge_flux_type
 		long* tri_full_flag
 		long* already_computed_flux
@@ -41,28 +45,30 @@ cdef extern from "shallow_water.c":
 		double* edge_coordinates
 		double* centroid_coordinates
 		long* number_of_boundaries
-		double* stage_edge_values
-		double* xmom_edge_values
-		double* ymom_edge_values
-		double* bed_edge_values
-		double* height_edge_values
-		double* stage_centroid_values
-		double* xmom_centroid_values
-		double* ymom_centroid_values
-		double* bed_centroid_values
-		double* height_centroid_values
-		double* stage_vertex_values
-		double* xmom_vertex_values
-		double* ymom_vertex_values
-		double* bed_vertex_values
-		double* height_vertex_values
-		double* stage_boundary_values
-		double* xmom_boundary_values
-		double* ymom_boundary_values
-		double* bed_boundary_values
-		double* stage_explicit_update
-		double* xmom_explicit_update
-		double* ymom_explicit_update
+#Single Precision Work
+		float* stage_edge_values
+		float* xmom_edge_values
+		float* ymom_edge_values
+		float* bed_edge_values
+		float* height_edge_values
+		float* stage_centroid_values
+		float* xmom_centroid_values
+		float* ymom_centroid_values
+		float* bed_centroid_values
+		float* height_centroid_values
+		float* stage_vertex_values
+		float* xmom_vertex_values
+		float* ymom_vertex_values
+		float* bed_vertex_values
+		float* height_vertex_values
+		float* stage_boundary_values
+		float* xmom_boundary_values
+		float* ymom_boundary_values
+		float* bed_boundary_values
+		float* stage_explicit_update
+		float* xmom_explicit_update
+		float* ymom_explicit_update
+
 		long* flux_update_frequency
 		long* update_next_flux
 		long* update_extrapolation
@@ -98,7 +104,7 @@ cdef inline get_python_domain(domain* D, object domain_object):
 	cdef np.ndarray[double, ndim=2, mode="c"] normals
 	cdef np.ndarray[double, ndim=2, mode="c"] edgelengths
 	cdef np.ndarray[double, ndim=1, mode="c"] radii
-	cdef np.ndarray[double, ndim=1, mode="c"] areas
+	cdef np.ndarray[float, ndim=1, mode="c"] areas # Changed to Float : jayashri
 	cdef np.ndarray[long, ndim=1, mode="c"] edge_flux_type
 	cdef np.ndarray[long, ndim=1, mode="c"] tri_full_flag
 	cdef np.ndarray[long, ndim=2, mode="c"] already_computed_flux
@@ -122,11 +128,11 @@ cdef inline get_python_domain(domain* D, object domain_object):
 	cdef np.ndarray[long, ndim=1, mode="c"] riverwall_rowIndex
 	cdef np.ndarray[double, ndim=2, mode="c"] riverwall_hydraulic_properties
 
-	cdef np.ndarray[double, ndim=2, mode="c"] edge_values
-	cdef np.ndarray[double, ndim=1, mode="c"] centroid_values
-	cdef np.ndarray[double, ndim=2, mode="c"] vertex_values
-	cdef np.ndarray[double, ndim=1, mode="c"] boundary_values
-	cdef np.ndarray[double, ndim=1, mode="c"] explicit_update
+	cdef np.ndarray[float, ndim=2, mode="c"] edge_values
+	cdef np.ndarray[float, ndim=1, mode="c"] centroid_values
+	cdef np.ndarray[float, ndim=2, mode="c"] vertex_values
+	cdef np.ndarray[float, ndim=1, mode="c"] boundary_values
+	cdef np.ndarray[float, ndim=1, mode="c"] explicit_update
 
 	cdef object quantities
 	cdef object riverwallData

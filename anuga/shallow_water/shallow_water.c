@@ -92,8 +92,8 @@ int _rotate_edge(struct edge *E, double n1, double n2) {
     return 0;
 }
 
-int find_qmin_and_qmax(double dq0, double dq1, double dq2,
-        double *qmin, double *qmax) {
+int find_qmin_and_qmax(float dq0, float dq1, float dq2,
+        float *qmin, float *qmax) {
     // Considering the centroid of an FV triangle and the vertices of its
     // auxiliary triangle, find
     // qmin=min(q)-qc and qmax=max(q)-qc,
@@ -145,7 +145,7 @@ int find_qmin_and_qmax(double dq0, double dq1, double dq2,
     return 0;
 }
 
-int limit_gradient(double *dqv, double qmin, double qmax, double beta_w) {
+int limit_gradient(float *dqv, float qmin, float qmax, float beta_w) {
     // Given provisional jumps dqv from the FV triangle centroid to its
     // vertices and jumps qmin (qmax) between the centroid of the FV
     // triangle and the minimum (maximum) of the values at the centroid of
@@ -1733,38 +1733,41 @@ int _assign_wind_field_values(int N,
 int _extrapolate_second_order_sw_old(int number_of_elements,
         double epsilon,
         double minimum_allowed_height,
-        double beta_w,
-        double beta_w_dry,
-        double beta_uh,
-        double beta_uh_dry,
-        double beta_vh,
-        double beta_vh_dry,
+        float beta_w,
+        float beta_w_dry,
+        float beta_uh,
+        float beta_uh_dry,
+        float beta_vh,
+        float beta_vh_dry,
         long* surrogate_neighbours,
         long* number_of_boundaries,
         double* centroid_coordinates,
-        double* stage_centroid_values,
-        double* xmom_centroid_values,
-        double* ymom_centroid_values,
-        double* elevation_centroid_values,
+
+        float* stage_centroid_values,
+        float* xmom_centroid_values,
+        float* ymom_centroid_values,
+        float* elevation_centroid_values,
+
         double* vertex_coordinates,
-        double* stage_vertex_values,
-        double* xmom_vertex_values,
-        double* ymom_vertex_values,
-        double* elevation_vertex_values,
+        
+	float* stage_vertex_values,
+        float* xmom_vertex_values,
+        float* ymom_vertex_values,
+        float* elevation_vertex_values,
         int optimise_dry_cells,
         int extrapolate_velocity_second_order) {
 
 
 
     // Local variables
-    double a, b; // Gradient vector used to calculate vertex values from centroids
+    float a, b; // Gradient vector used to calculate vertex values from centroids
     int k, k0, k1, k2, k3, k6, coord_index, i;
-    double x, y, x0, y0, x1, y1, x2, y2, xv0, yv0, xv1, yv1, xv2, yv2; // Vertices of the auxiliary triangle
-    double dx1, dx2, dy1, dy2, dxv0, dxv1, dxv2, dyv0, dyv1, dyv2, dq0, dq1, dq2, area2, inv_area2;
-    double dqv[3], qmin, qmax, hmin, hmax;
-    double hc, h0, h1, h2, beta_tmp, hfactor;
-    double xmom_centroid_store[number_of_elements], ymom_centroid_store[number_of_elements];
-    double dk, dv0, dv1, dv2;
+    float x, y, x0, y0, x1, y1, x2, y2, xv0, yv0, xv1, yv1, xv2, yv2; // Vertices of the auxiliary triangle
+    float dx1, dx2, dy1, dy2, dxv0, dxv1, dxv2, dyv0, dyv1, dyv2, dq0, dq1, dq2, area2, inv_area2;
+    float dqv[3], qmin, qmax, hmin, hmax;
+    float hc, h0, h1, h2, beta_tmp, hfactor;
+    float xmom_centroid_store[number_of_elements], ymom_centroid_store[number_of_elements];
+    float dk, dv0, dv1, dv2;
 
     if (extrapolate_velocity_second_order == 1) {
         // Replace momentum centroid with velocity centroid to allow velocity
@@ -2249,44 +2252,50 @@ int _extrapolate_second_order_sw(struct domain *D) {
     int number_of_elements;
     double epsilon;
     double minimum_allowed_height;
-    double beta_w;
-    double beta_w_dry;
-    double beta_uh;
-    double beta_uh_dry;
-    double beta_vh;
-    double beta_vh_dry;
+
+    float beta_w;
+    float beta_w_dry;
+    float beta_uh;
+    float beta_uh_dry;
+    float beta_vh;
+    float beta_vh_dry;
+
     long* surrogate_neighbours;
     long* number_of_boundaries;
     double* centroid_coordinates;
-    double* stage_centroid_values;
-    double* xmom_centroid_values;
-    double* ymom_centroid_values;
-    double* bed_centroid_values;
+
+    float* stage_centroid_values;
+    float* xmom_centroid_values;
+    float* ymom_centroid_values;
+    float* bed_centroid_values;
+
     double* edge_coordinates;
     double* vertex_coordinates;
-    double* stage_edge_values;
-    double* xmom_edge_values;
-    double* ymom_edge_values;
-    double* bed_edge_values;
-    double* stage_vertex_values;
-    double* xmom_vertex_values;
-    double* ymom_vertex_values;
-    double* bed_vertex_values;
+
+    float* stage_edge_values;
+    float* xmom_edge_values;
+    float* ymom_edge_values;
+    float* bed_edge_values;
+    float* stage_vertex_values;
+    float* xmom_vertex_values;
+    float* ymom_vertex_values;
+    float* bed_vertex_values;
+
     int optimise_dry_cells;
     int extrapolate_velocity_second_order;
 
     // Local variables
-    double a, b; // Gradient vector used to calculate edge values from centroids
+    float a, b; // Gradient vector used to calculate edge values from centroids
     int k, k0, k1, k2, k3, k6, coord_index, i;
-    double x, y, x0, y0, x1, y1, x2, y2, xv0, yv0, xv1, yv1, xv2, yv2; // Vertices of the auxiliary triangle
-    double dx1, dx2, dy1, dy2, dxv0, dxv1, dxv2, dyv0, dyv1, dyv2, dq0, dq1, dq2, area2, inv_area2;
-    double dqv[3], qmin, qmax, hmin, hmax;
-    double hc, h0, h1, h2, beta_tmp, hfactor;
+    float x, y, x0, y0, x1, y1, x2, y2, xv0, yv0, xv1, yv1, xv2, yv2; // Vertices of the auxiliary triangle
+    float dx1, dx2, dy1, dy2, dxv0, dxv1, dxv2, dyv0, dyv1, dyv2, dq0, dq1, dq2, area2, inv_area2;
+    float dqv[3], qmin, qmax, hmin, hmax;
+    float hc, h0, h1, h2, beta_tmp, hfactor;
     //double dk, dv0, dv1, dv2, de[3], demin, dcmax, r0scale;
-    double dk, dv0, dv1, dv2;
+    float dk, dv0, dv1, dv2;
 
-    double *xmom_centroid_store;
-    double *ymom_centroid_store;
+    float *xmom_centroid_store;
+    float *ymom_centroid_store;
     //double *stage_centroid_store;
 
 
@@ -2364,8 +2373,8 @@ int _extrapolate_second_order_sw(int number_of_elements,
 
    // Use malloc to avoid putting these variables on the stack, which can cause
    // segfaults in large model runs
-    xmom_centroid_store = malloc(number_of_elements*sizeof(double));
-    ymom_centroid_store = malloc(number_of_elements*sizeof(double));
+    xmom_centroid_store = malloc(number_of_elements*sizeof(float));
+    ymom_centroid_store = malloc(number_of_elements*sizeof(float));
     // stage_centroid_store = malloc(number_of_elements*sizeof(double));
 
     if (extrapolate_velocity_second_order == 1) {
@@ -2861,42 +2870,48 @@ int _extrapolate_second_order_edge_sw(struct domain *D) {
     int number_of_elements;
     double epsilon;
     double minimum_allowed_height;
-    double beta_w;
-    double beta_w_dry;
-    double beta_uh;
-    double beta_uh_dry;
-    double beta_vh;
-    double beta_vh_dry;
+    float beta_w;
+    float beta_w_dry;
+    float beta_uh;
+    float beta_uh_dry;
+    float beta_vh;
+    float beta_vh_dry;
+
     long* surrogate_neighbours;
     long* number_of_boundaries;
+
     double* centroid_coordinates;
-    double* stage_centroid_values;
-    double* xmom_centroid_values;
-    double* ymom_centroid_values;
-    double* bed_centroid_values;
+
+    float* stage_centroid_values;
+    float* xmom_centroid_values;
+    float* ymom_centroid_values;
+    float* bed_centroid_values;
+
     double* edge_coordinates;
-    double* stage_edge_values;
-    double* xmom_edge_values;
-    double* ymom_edge_values;
-    double* bed_edge_values;
-    double* stage_vertex_values;
-    double* xmom_vertex_values;
-    double* ymom_vertex_values;
-    double* bed_vertex_values;
+
+    float* stage_edge_values;
+    float* xmom_edge_values;
+    float* ymom_edge_values;
+    float* bed_edge_values;
+    float* stage_vertex_values;
+    float* xmom_vertex_values;
+    float* ymom_vertex_values;
+    float* bed_vertex_values;
+
     int optimise_dry_cells;
     int extrapolate_velocity_second_order;
 
     // Local variables
-    double a, b; // Gradient vector used to calculate edge values from centroids
+    float a, b; // Gradient vector used to calculate edge values from centroids
     int k, k0, k1, k2, k3, k6, coord_index, i;
-    double x, y, x0, y0, x1, y1, x2, y2, xv0, yv0, xv1, yv1, xv2, yv2; // Vertices of the auxiliary triangle
-    double dx1, dx2, dy1, dy2, dxv0, dxv1, dxv2, dyv0, dyv1, dyv2, dq0, dq1, dq2, area2, inv_area2;
-    double dqv[3], qmin, qmax, hmin, hmax;
-    double hc, h0, h1, h2, beta_tmp, hfactor;
+    float x, y, x0, y0, x1, y1, x2, y2, xv0, yv0, xv1, yv1, xv2, yv2; // Vertices of the auxiliary triangle
+    float dx1, dx2, dy1, dy2, dxv0, dxv1, dxv2, dyv0, dyv1, dyv2, dq0, dq1, dq2, area2, inv_area2;
+    float dqv[3], qmin, qmax, hmin, hmax;
+    float hc, h0, h1, h2, beta_tmp, hfactor;
     //double dk, dv0, dv1, dv2, de[3], demin, dcmax, r0scale;
-    double dk, de[3];
+    float dk, de[3];
 
-    double *xmom_centroid_store, *ymom_centroid_store, *stage_centroid_store;
+    float *xmom_centroid_store, *ymom_centroid_store, *stage_centroid_store;
 
 
     // Associate memory location of Domain varialbe with local aliases
@@ -2933,9 +2948,9 @@ int _extrapolate_second_order_edge_sw(struct domain *D) {
 
   // Use malloc to avoid putting these variables on the stack, which can cause
   // segfaults in large model runs
-  xmom_centroid_store = malloc(number_of_elements*sizeof(double));
-  ymom_centroid_store = malloc(number_of_elements*sizeof(double));
-  stage_centroid_store = malloc(number_of_elements*sizeof(double));
+  xmom_centroid_store = malloc(number_of_elements*sizeof(float));
+  ymom_centroid_store = malloc(number_of_elements*sizeof(float));
+  stage_centroid_store = malloc(number_of_elements*sizeof(float));
 
   if(extrapolate_velocity_second_order==1){
       // Replace momentum centroid with velocity centroid to allow velocity
@@ -3509,16 +3524,16 @@ double _compute_fluxes_central(int number_of_elements,
         double* radii,
         double* areas,
         long* tri_full_flag,
-        double* stage_edge_values,
-        double* xmom_edge_values,
-        double* ymom_edge_values,
-        double* bed_edge_values,
-        double* stage_boundary_values,
-        double* xmom_boundary_values,
-        double* ymom_boundary_values,
-        double* stage_explicit_update,
-        double* xmom_explicit_update,
-        double* ymom_explicit_update,
+        float* stage_edge_values,
+        float* xmom_edge_values,
+        float* ymom_edge_values,
+        float* bed_edge_values,
+        float* stage_boundary_values,
+        float* xmom_boundary_values,
+        float* ymom_boundary_values,
+        float* stage_explicit_update,
+        float* xmom_explicit_update,
+        float* ymom_explicit_update,
         long* already_computed_flux,
         double* max_speed_array,
         long optimise_dry_cells) {
@@ -3534,7 +3549,7 @@ double _compute_fluxes_central(int number_of_elements,
 
 
     // Workspace (making them static actually made function slightly slower (Ole))
-    double ql[3], qr[3], edgeflux[3]; // Work array for summing up fluxes
+    float ql[3], qr[3], edgeflux[3]; // Work array for summing up fluxes
 
     static long call = 1; // Static local variable flagging already computed flux
 
@@ -3543,9 +3558,9 @@ double _compute_fluxes_central(int number_of_elements,
 
     // Set explicit_update to zero for all conserved_quantities.
     // This assumes compute_fluxes called before forcing terms
-    memset((char*) stage_explicit_update, 0, number_of_elements * sizeof (double));
-    memset((char*) xmom_explicit_update, 0, number_of_elements * sizeof (double));
-    memset((char*) ymom_explicit_update, 0, number_of_elements * sizeof (double));
+    memset((char*) stage_explicit_update, 0, number_of_elements * sizeof (float));
+    memset((char*) xmom_explicit_update, 0, number_of_elements * sizeof (float));
+    memset((char*) ymom_explicit_update, 0, number_of_elements * sizeof (float));
 
     // For all triangles
     for (k = 0; k < number_of_elements; k++) {

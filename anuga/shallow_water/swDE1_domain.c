@@ -768,9 +768,9 @@ double _compute_fluxes_central(struct domain *D, double timestep){
 
     // Set explicit_update to zero for all conserved_quantities.
     // This assumes compute_fluxes called before forcing terms
-    memset((char*) D->stage_explicit_update, 0, D->number_of_elements * sizeof (double));
-    memset((char*) D->xmom_explicit_update, 0, D->number_of_elements * sizeof (double));
-    memset((char*) D->ymom_explicit_update, 0, D->number_of_elements * sizeof (double));
+    memset((char*) D->stage_explicit_update, 0, D->number_of_elements * sizeof (float));
+    memset((char*) D->xmom_explicit_update, 0, D->number_of_elements * sizeof (float));
+    memset((char*) D->ymom_explicit_update, 0, D->number_of_elements * sizeof (float));
 
 
     // Counter for riverwall edges
@@ -1115,23 +1115,23 @@ double _compute_fluxes_central(struct domain *D, double timestep){
 }
 
 // Protect against the water elevation falling below the triangle bed
-double  _protect(int N,
-         double minimum_allowed_height,
-         double maximum_allowed_speed,
-         double epsilon,
-         double* wc,
-         double* wv,
-         double* zc,
-         double* zv,
-         double* xmomc,
-         double* ymomc,
-         double* areas,
-         double* xc,
-         double* yc) {
+float  _protect(int N,
+         float minimum_allowed_height,
+         float maximum_allowed_speed,
+         float epsilon,
+         float* wc,
+         float* wv,
+         float* zc,
+         float* zv,
+         float* xmomc,
+         float* ymomc,
+         float* areas,
+         float* xc,
+         float* yc) {
 
   int k;
-  double hc, bmin;
-  double mass_error = 0.;
+  float hc, bmin;
+  float mass_error = 0.;
   // This acts like minimum_allowed height, but scales with the vertical
   // distance between the bed_centroid_value and the max bed_edge_value of
   // every triangle.
@@ -1177,22 +1177,25 @@ double  _protect(int N,
 }
 
 // Protect against the water elevation falling below the triangle bed
-double  _protect_new(struct domain *D) {
+float  _protect_new(struct domain *D) {
 
   int k;
-  double hc, bmin;
-  double mass_error = 0.;
+  float hc, bmin;
+  float mass_error = 0.;
 
-  double* wc;
-  double* zc;
-  double* wv;
-  double* xmomc;
-  double* ymomc;
-  double* areas;
+  float* wc;
+  float* zc;
+  float* wv;
+  float* xmomc;
+  float* ymomc;
+  float* areas;  //temp changeed to float (was double - PS: area to be kept double)
 
   double minimum_allowed_height;
 
   minimum_allowed_height = D->minimum_allowed_height;
+
+ float min_height = (float) minimum_allowed_height ;
+
 
   wc = D->stage_centroid_values;
   zc = D->bed_centroid_values;
@@ -1211,7 +1214,7 @@ double  _protect_new(struct domain *D) {
   //if (maximum_allowed_speed < epsilon) {
     for (k=0; k<D->number_of_elements; k++) {
       hc = wc[k] - zc[k];
-      if (hc < minimum_allowed_height*1.0 ){
+      if (hc < min_height*1.0 ){
             // Set momentum to zero and ensure h is non negative
             xmomc[k] = 0.;
             ymomc[k] = 0.;
@@ -1248,8 +1251,8 @@ double  _protect_new(struct domain *D) {
 
 
 
-int find_qmin_and_qmax(double dq0, double dq1, double dq2,
-               double *qmin, double *qmax){
+int find_qmin_and_qmax(float dq0, float dq1, float dq2,
+               float *qmin, float *qmax){
   // Considering the centroid of an FV triangle and the vertices of its
   // auxiliary triangle, find
   // qmin=min(q)-qc and qmax=max(q)-qc,
@@ -1268,7 +1271,7 @@ int find_qmin_and_qmax(double dq0, double dq1, double dq2,
   return 0;
 }
 
-int limit_gradient(double *dqv, double qmin, double qmax, double beta_w){
+int limit_gradient(float *dqv, float qmin, float qmax, float beta_w){
   // Given provisional jumps dqv from the FV triangle centroid to its
   // vertices/edges, and jumps qmin (qmax) between the centroid of the FV
   // triangle and the minimum (maximum) of the values at the auxiliary triangle
@@ -1342,17 +1345,38 @@ int limit_gradient(double *dqv, double qmin, double qmax, double beta_w){
 int _extrapolate_second_order_edge_sw(struct domain *D){
 
   // Local variables
-  double a, b; // Gradient vector used to calculate edge values from centroids
+  // Original Declaration
+ //double a, b; // Gradient vector used to calculate edge values from centroids
+ // int k, k0, k1, k2, k3, k6, coord_index, i;
+ // double x, y, x0, y0, x1, y1, x2, y2, xv0, yv0, xv1, yv1, xv2, yv2; // Vertices of the auxiliary triangle
+ // double dx1, dx2, dy1, dy2, dxv0, dxv1, dxv2, dyv0, dyv1, dyv2, dq0, dq1, dq2, area2, inv_area2;
+ // double dqv[3], qmin, qmax, hmin, hmax;
+ // double hc, h0, h1, h2, beta_tmp, hfactor;
+//  double dk, dk_inv, a_tmp, b_tmp, c_tmp,d_tmp; //original declaration : Jayashri
+//double dk, dk_inv, a_tmp, b_tmp, c_tmp,d_tmp
+  // Original Declaration ends
+  
   int k, k0, k1, k2, k3, k6, coord_index, i;
-  double x, y, x0, y0, x1, y1, x2, y2, xv0, yv0, xv1, yv1, xv2, yv2; // Vertices of the auxiliary triangle
-  double dx1, dx2, dy1, dy2, dxv0, dxv1, dxv2, dyv0, dyv1, dyv2, dq0, dq1, dq2, area2, inv_area2;
-  double dqv[3], qmin, qmax, hmin, hmax;
-  double hc, h0, h1, h2, beta_tmp, hfactor;
-  double dk, dk_inv, a_tmp, b_tmp, c_tmp,d_tmp;
+  float x, y, x0, y0, x1, y1, x2, y2, xv0, yv0, xv1, yv1, xv2, yv2; // Vertices of the auxiliary triangle
+  float dx1, dx2, dy1, dy2, dxv0, dxv1, dxv2, dyv0, dyv1, dyv2, dq0, dq1, dq2, area2, inv_area2;
+  float dqv[3], qmin, qmax, hmin, hmax;
+  float hc, h0, h1, h2, beta_tmp, hfactor;
+  float dk, dk_inv, a_tmp, b_tmp, c_tmp,d_tmp;
+  float  a, b;
+//  double dk, dk_inv, a_tmp, b_tmp, c_tmp,d_tmp; //original declaration 
+//  double dk, dk_inv, a_tmp, b_tmp, c_tmp,d_tmp
+//
+//changes : Jayashri 
+  //  float  hc, h0, h1, h2, hmin, hmax, hfactor;
+  //float  dk, dq0, dq1, dq2,dx1,dx2,dy1,dy2,dqv,dxv0, dxv1, dxv2, dyv0, dyv1, dyv2, dk_inv;
+  //float  beta_w_dry, beta_w, beta_vh_dry, beta_tmp,beta_uh_dry,beta_uh,beta_vh_dry, beta_vh;
+  //float  x1, y1, x, y;
+  //float  area2, inv_area2 ; 
+  //float  a, b;
+//Chnages done : jayashri above vars shortlisted for single precision
 
-
-  memset((char*) D->x_centroid_work, 0, D->number_of_elements * sizeof (double));
-  memset((char*) D->y_centroid_work, 0, D->number_of_elements * sizeof (double));
+  memset((char*) D->x_centroid_work, 0, D->number_of_elements * sizeof (float));
+  memset((char*) D->y_centroid_work, 0, D->number_of_elements * sizeof (float));
 
   // Parameters used to control how the limiter is forced to first-order near
   // wet-dry regions
@@ -1446,7 +1470,7 @@ int _extrapolate_second_order_edge_sw(struct domain *D){
 
       dk = D->height_centroid_values[k];
       D->height_edge_values[k3] = dk;
-      D->height_edge_values[k3+1] = dk;
+     D->height_edge_values[k3+1] = dk;
       D->height_edge_values[k3+2] = dk;
 
       continue;
